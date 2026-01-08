@@ -209,29 +209,114 @@ http://localhost:8080
 
 ## 🔮 Melhorias Futuras
 
-### 📊 Observabilidade
+Esta seção descreve evoluções naturais do pipeline para um ambiente de produção, considerando **boas práticas de Engenharia de Dados**, bem como os **trade-offs de escopo, custo e complexidade** discutidos durante o desenvolvimento do case.
 
-* Integração com Prometheus / Grafana
-* Alertas de falha de pipeline
-* Métricas de qualidade de dados
+---
 
-### ☁️ Cloud Storage
+### 📊 Data Quality (Qualidade de Dados)
 
-* Armazenamento das camadas Bronze/Silver/Gold em S3, GCS ou ADLS
-* Separação entre compute e storage
-* Maior escalabilidade e resiliência
+O pipeline já possui um **primeiro nível de Data Quality** por meio do uso de validações de schema e regras implementadas com **Pandera**, garantindo:
 
-### 🔁 Evolução de Schema
+* Conformidade de tipos de dados
+* Presença de colunas obrigatórias
+* Regras básicas de consistência antes da promoção dos dados
 
-* Controle de versões
-* Processamento incremental
+Esse uso do Pandera pode ser considerado um **início de Data Quality**, focado em validações estruturais e de schema.
 
-### 🚀 CI/CD
+Como evolução futura, o processo poderia ser expandido para incluir:
 
-* GitHub Actions para testes automatizados
-* Deploy automatizado de DAGs
+* Métricas quantitativas de qualidade, como:
 
-Essas melhorias não foram implementadas por **restrições de budget**, conforme permitido pelo case.
+  * Percentual de registros inválidos
+  * Percentual de valores nulos por coluna
+  * Distribuição de valores inesperados
+* Persistência dessas métricas para análise histórica
+* Definição de **quality gates** entre Silver e Gold
+
+Essas melhorias aumentariam significativamente a **confiabilidade, governança e observabilidade dos dados**.
+
+---
+
+### 📈 Monitoramento e Alertas
+
+Em um cenário produtivo, o monitoramento poderia ser expandido para incluir:
+
+* Métricas de execução das DAGs:
+
+  * Tempo de execução por tarefa
+  * Volume de dados processados
+  * Taxa de falhas
+* Alertas automáticos para:
+
+  * Falhas de DAG
+  * Quebra de SLA
+  * Anomalias de qualidade de dados
+
+Exemplos de implementação:
+
+* Integração com **Datadog** para observabilidade centralizada (métricas, logs e alertas)
+* Alternativamente, uso de **Prometheus + Grafana** para coleta e visualização de métricas
+* Alertas via e-mail, Slack ou ferramentas corporativas
+
+No escopo do case, optou-se por utilizar os **logs e status nativos do Airflow**, evitando aumento de complexidade operacional e custos adicionais.
+
+---
+
+### ☁️ Armazenamento em Cloud (ADLS / S3 / GCS)
+
+Uma evolução natural do projeto seria mover o armazenamento local para um **data lake em cloud**, como:
+
+* Azure Data Lake Storage (ADLS)
+* Amazon S3
+* Google Cloud Storage
+
+Benefícios:
+
+* Separação clara entre **compute e storage**
+* Escalabilidade
+* Maior resiliência
+
+A não implementação no case se deu por **restrição de budget**, mantendo o projeto facilmente reproduzível em ambiente local.
+
+---
+
+### ⚙️ Trade-off: Spark dentro do Airflow
+
+Durante o desenho da solução, foi considerado o uso de **Apache Spark** para processamento distribuído.
+
+**Decisão tomada:**
+
+* Não utilizar Spark neste case
+
+**Motivos:**
+
+* Volume de dados reduzido, não justificando processamento distribuído
+* Aumento significativo de complexidade operacional
+* Overhead desnecessário para um pipeline batch simples
+
+O Airflow foi utilizado **exclusivamente como orquestrador**, enquanto o processamento foi mantido em Python, respeitando o princípio de simplicidade e adequação ao problema.
+
+---
+
+### ☸️ Trade-off: Não utilização de Kubernetes
+
+Embora Kubernetes seja amplamente utilizado em ambientes de dados modernos, ele não foi adotado neste projeto pelos seguintes motivos:
+
+* Complexidade operacional elevada para o escopo do case
+* Overhead de setup e manutenção
+* Ausência de benefícios claros para um pipeline de batch simples
+
+A escolha por **Docker Compose** garantiu:
+
+* Reprodutibilidade
+* Facilidade de execução local
+* Menor curva de aprendizado para avaliadores
+
+Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado para:
+
+* Alta disponibilidade
+* Escalonamento automático
+* Ambientes multi-tenant
 
 ---
 
