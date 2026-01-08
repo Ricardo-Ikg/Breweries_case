@@ -6,15 +6,14 @@ services:
       context: .
       dockerfile: docker/airflow/Dockerfile
     container_name: airflow
-    command:
-      - airflow
-      - standalone
+    entrypoint: ["bash", "/entrypoint.sh"]
     environment:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       PYTHONPATH: /opt/airflow/src
     ports:
       - "8080:8080"
     volumes:
+      - ./entrypoint.sh:/entrypoint.sh
       - ./dags:/opt/airflow/dags
       - ./src:/opt/airflow/src
       - ./data:/opt/airflow/data
