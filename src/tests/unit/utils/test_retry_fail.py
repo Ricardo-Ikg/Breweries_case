@@ -15,5 +15,6 @@ def test_fetch_api_retry_fail_fast():
             fetch_api(
                 url="http://fake-api",
                 max_retries=2,
-                sleep_between_requests=0,  # 👈 CRÍTICO
+                sleep_between_requests=0,
             )
+
