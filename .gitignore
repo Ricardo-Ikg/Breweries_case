@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+
+# Airflow
+airflow.cfg
+airflow.db
+logs/
+
+# Data Lake / dados gerados
+data/
+*.parquet
+*.csv
+*.json
+
+# Delta / Spark
+spark-warehouse/
+_metastore_db/
+delta/
+
+# Docker
+.env
+*.log
