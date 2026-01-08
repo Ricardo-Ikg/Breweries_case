@@ -159,21 +159,58 @@ A escolha por Docker também atende ao critério de modularização solicitado n
 
 ## ⚖️ Trade-offs e Decisões de Engenharia
 
-Durante o desenvolvimento, algumas decisões foram tomadas considerando **escopo, tempo e budget**.
+Durante o desenvolvimento, algumas decisões foram tomadas considerando **escopo, tempo, custo e simplicidade operacional**, conforme esperado para um case técnico.
 
-### Armazenamento
+---
+
+### 🗄️ Trade-off: SQLite vs PostgreSQL (Metadata / Airflow)
+
+No ambiente atual do projeto, foi utilizado **SQLite** como banco de metadados do Airflow.
+
+**Decisão tomada:**
+
+* Utilizar SQLite em vez de PostgreSQL
+
+**Motivos:**
+
+* Simplicidade de setup e execução local
+* Redução de dependências e configuração adicional
+* Facilidade de reprodução do ambiente para avaliadores
+
+**Trade-off assumido:**
+
+* SQLite **não é recomendado para ambientes produtivos** ou de alta concorrência
+* Limitações de escalabilidade e concorrência
+
+**Cenário de produção:**
+
+* A escolha adequada seria **PostgreSQL**, garantindo:
+
+  * Maior robustez
+  * Melhor suporte a concorrência
+  * Maior confiabilidade para execução paralela de DAGs
+
+Essa decisão foi consciente e alinhada ao escopo do case, priorizando clareza e reprodutibilidade.
+
+---
+
+### ☁️ Armazenamento
 
 * **Atual:** armazenamento local
 * **Trade-off:** simplicidade vs. escalabilidade
 * **Justificativa:** evitar custos de cloud para um case técnico
 
-### Observabilidade
+---
 
-* **Atual:** logs e status de tarefas via Airflow
+### 📊 Observabilidade
+
+* **Atual:** logs e status nativos do Airflow
 * **Trade-off:** implementação simples vs. stack completa de monitoramento
 * **Justificativa:** foco no pipeline funcional e correto
 
-### Tecnologias
+---
+
+### ⚙️ Tecnologias
 
 * Não foram utilizadas ferramentas como Delta Lake, Great Expectations ou serviços cloud gerenciados para manter o projeto acessível e reproduzível localmente.
 
