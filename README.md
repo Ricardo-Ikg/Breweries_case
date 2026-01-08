@@ -159,38 +159,43 @@ A escolha por Docker também atende ao critério de modularização solicitado n
 
 ## ⚖️ Trade-offs e Decisões de Engenharia
 
+Esta seção documenta explicitamente decisões técnicas tomadas no projeto, incluindo **banco de metadados do Airflow**, armazenamento, processamento e infraestrutura. O objetivo é deixar claro o racional por trás de cada escolha, conforme esperado em avaliações técnicas.
+
 Durante o desenvolvimento, algumas decisões foram tomadas considerando **escopo, tempo, custo e simplicidade operacional**, conforme esperado para um case técnico.
 
 ---
 
 ### 🗄️ Trade-off: SQLite vs PostgreSQL (Metadata / Airflow)
 
-No ambiente atual do projeto, foi utilizado **SQLite** como banco de metadados do Airflow.
+O **Apache Airflow** necessita de um banco de dados para armazenar seus **metadados** (estado de DAGs, tasks, logs, variáveis, conexões, usuários etc.).
 
-**Decisão tomada:**
+#### Decisão adotada no projeto
 
-* Utilizar SQLite em vez de PostgreSQL
+* Utilização de **SQLite** como banco de metadados
 
-**Motivos:**
+#### Motivos da escolha
 
-* Simplicidade de setup e execução local
-* Redução de dependências e configuração adicional
-* Facilidade de reprodução do ambiente para avaliadores
+* Simplicidade extrema de setup
+* Execução local sem dependências adicionais
+* Facilidade de avaliação por parte de recrutadores e avaliadores técnicos
+* Redução de complexidade operacional em um case técnico
 
-**Trade-off assumido:**
+#### Trade-offs assumidos
 
-* SQLite **não é recomendado para ambientes produtivos** ou de alta concorrência
-* Limitações de escalabilidade e concorrência
+* SQLite **não é recomendado para ambientes produtivos** do Airflow
+* Limitações de concorrência e locking
+* Não suporta execução paralela robusta de múltiplas DAGs
 
-**Cenário de produção:**
+#### Cenário recomendado para produção
 
-* A escolha adequada seria **PostgreSQL**, garantindo:
+Em um ambiente produtivo, o banco de metadados do Airflow deveria ser **PostgreSQL**, garantindo:
 
-  * Maior robustez
-  * Melhor suporte a concorrência
-  * Maior confiabilidade para execução paralela de DAGs
+* Suporte adequado a concorrência
+* Maior confiabilidade
+* Escalabilidade
+* Compatibilidade total com executores distribuídos do Airflow
 
-Essa decisão foi consciente e alinhada ao escopo do case, priorizando clareza e reprodutibilidade.
+📌 A escolha por SQLite foi **consciente e documentada**, adequada ao escopo do case, mas não seria mantida em produção.
 
 ---
 
@@ -236,10 +241,29 @@ cd Breweries_case
 docker compose up -d
 ```
 
-A interface do Airflow ficará disponível em:
+### 🌐 Airflow UI e Credenciais
+
+Após subir os containers, a interface web do **Apache Airflow** ficará disponível em:
 
 ```
 http://localhost:8080
+```
+
+As credenciais utilizadas para acesso à UI do Airflow são definidas via **script de bootstrap** incluído no repositório e são:
+
+* **Usuário:** `admin`
+* **Senha:** `admin123`
+
+📌 Essas credenciais são utilizadas **exclusivamente para fins de desenvolvimento local e avaliação do case**.
+
+Em um ambiente produtivo, o recomendado seria:
+
+* Integração com um provedor de identidade (SSO / OAuth)
+* Uso de secrets managers
+* Restrição de acesso por perfil
+
+---
+
 ```
 
 ---
@@ -254,21 +278,20 @@ Esta seção descreve evoluções naturais do pipeline para um ambiente de produ
 
 O pipeline já possui um **primeiro nível de Data Quality** por meio do uso de validações de schema e regras implementadas com **Pandera**, garantindo:
 
-* Conformidade de tipos de dados
-* Presença de colunas obrigatórias
-* Regras básicas de consistência antes da promoção dos dados
+- Conformidade de tipos de dados
+- Presença de colunas obrigatórias
+- Regras básicas de consistência antes da promoção dos dados
 
 Esse uso do Pandera pode ser considerado um **início de Data Quality**, focado em validações estruturais e de schema.
 
 Como evolução futura, o processo poderia ser expandido para incluir:
 
-* Métricas quantitativas de qualidade, como:
-
-  * Percentual de registros inválidos
-  * Percentual de valores nulos por coluna
-  * Distribuição de valores inesperados
-* Persistência dessas métricas para análise histórica
-* Definição de **quality gates** entre Silver e Gold
+- Métricas quantitativas de qualidade, como:
+  - Percentual de registros inválidos
+  - Percentual de valores nulos por coluna
+  - Distribuição de valores inesperados
+- Persistência dessas métricas para análise histórica
+- Definição de **quality gates** entre Silver e Gold
 
 Essas melhorias aumentariam significativamente a **confiabilidade, governança e observabilidade dos dados**.
 
@@ -278,22 +301,19 @@ Essas melhorias aumentariam significativamente a **confiabilidade, governança e
 
 Em um cenário produtivo, o monitoramento poderia ser expandido para incluir:
 
-* Métricas de execução das DAGs:
-
-  * Tempo de execução por tarefa
-  * Volume de dados processados
-  * Taxa de falhas
-* Alertas automáticos para:
-
-  * Falhas de DAG
-  * Quebra de SLA
-  * Anomalias de qualidade de dados
+- Métricas de execução das DAGs:
+  - Tempo de execução por tarefa
+  - Volume de dados processados
+  - Taxa de falhas
+- Alertas automáticos para:
+  - Falhas de DAG
+  - Quebra de SLA
+  - Anomalias de qualidade de dados
 
 Exemplos de implementação:
-
-* Integração com **Datadog** para observabilidade centralizada (métricas, logs e alertas)
-* Alternativamente, uso de **Prometheus + Grafana** para coleta e visualização de métricas
-* Alertas via e-mail, Slack ou ferramentas corporativas
+- Integração com **Datadog** para observabilidade centralizada (métricas, logs e alertas)
+- Alternativamente, uso de **Prometheus + Grafana** para coleta e visualização de métricas
+- Alertas via e-mail, Slack ou ferramentas corporativas
 
 No escopo do case, optou-se por utilizar os **logs e status nativos do Airflow**, evitando aumento de complexidade operacional e custos adicionais.
 
@@ -303,15 +323,14 @@ No escopo do case, optou-se por utilizar os **logs e status nativos do Airflow**
 
 Uma evolução natural do projeto seria mover o armazenamento local para um **data lake em cloud**, como:
 
-* Azure Data Lake Storage (ADLS)
-* Amazon S3
-* Google Cloud Storage
+- Azure Data Lake Storage (ADLS)
+- Amazon S3
+- Google Cloud Storage
 
 Benefícios:
-
-* Separação clara entre **compute e storage**
-* Escalabilidade
-* Maior resiliência
+- Separação clara entre **compute e storage**
+- Escalabilidade
+- Maior resiliência
 
 A não implementação no case se deu por **restrição de budget**, mantendo o projeto facilmente reproduzível em ambiente local.
 
@@ -322,14 +341,12 @@ A não implementação no case se deu por **restrição de budget**, mantendo o 
 Durante o desenho da solução, foi considerado o uso de **Apache Spark** para processamento distribuído.
 
 **Decisão tomada:**
-
-* Não utilizar Spark neste case
+- Não utilizar Spark neste case
 
 **Motivos:**
-
-* Volume de dados reduzido, não justificando processamento distribuído
-* Aumento significativo de complexidade operacional
-* Overhead desnecessário para um pipeline batch simples
+- Volume de dados reduzido, não justificando processamento distribuído
+- Aumento significativo de complexidade operacional
+- Overhead desnecessário para um pipeline batch simples
 
 O Airflow foi utilizado **exclusivamente como orquestrador**, enquanto o processamento foi mantido em Python, respeitando o princípio de simplicidade e adequação ao problema.
 
@@ -339,24 +356,24 @@ O Airflow foi utilizado **exclusivamente como orquestrador**, enquanto o process
 
 Embora Kubernetes seja amplamente utilizado em ambientes de dados modernos, ele não foi adotado neste projeto pelos seguintes motivos:
 
-* Complexidade operacional elevada para o escopo do case
-* Overhead de setup e manutenção
-* Ausência de benefícios claros para um pipeline de batch simples
+- Complexidade operacional elevada para o escopo do case
+- Overhead de setup e manutenção
+- Ausência de benefícios claros para um pipeline de batch simples
 
 A escolha por **Docker Compose** garantiu:
-
-* Reprodutibilidade
-* Facilidade de execução local
-* Menor curva de aprendizado para avaliadores
+- Reprodutibilidade
+- Facilidade de execução local
+- Menor curva de aprendizado para avaliadores
 
 Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado para:
-
-* Alta disponibilidade
-* Escalonamento automático
-* Ambientes multi-tenant
+- Alta disponibilidade
+- Escalonamento automático
+- Ambientes multi-tenant
 
 ---
 
 ## 📌 Considerações Finais
 
 Este projeto demonstra uma abordagem sólida de Engenharia de Dados, com foco em organização, qualidade, clareza arquitetural e boas práticas de mercado.
+
+```
