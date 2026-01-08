@@ -1,6 +1,6 @@
 # 🍺 Breweries Data Engineering Case
 
-Este repositório contém a solução para o **BEES Data Engineering – Breweries Case**, cujo objetivo é demonstrar a construção de um pipeline de dados completo a partir do consumo de uma API pública, seguindo o padrão de **arquitetura Medallion (Bronze / Silver / Gold)**, com orquestração, testes e documentação adequada fileciteturn0file0.
+Este repositório contém a solução para o **BEES Data Engineering – Breweries Case**, cujo objetivo é demonstrar a construção de um pipeline de dados completo a partir do consumo de uma API pública, seguindo o padrão de **arquitetura Medallion (Bronze / Silver / Gold)**, com orquestração, testes e documentação adequada.
 
 ---
 
@@ -377,3 +377,4 @@ Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado p
 Este projeto demonstra uma abordagem sólida de Engenharia de Dados, com foco em organização, qualidade, clareza arquitetural e boas práticas de mercado.
 
 ```
+
