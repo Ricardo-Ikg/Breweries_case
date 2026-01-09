@@ -33,16 +33,16 @@ O diagrama abaixo representa não apenas o fluxo lógico da arquitetura Medallio
                         ▼
 ┌──────────────────────────────────────────────┐
 │                Apache Airflow                │
-│        Orquestração e agendamento             │
-│  - Scheduling                                 │
+│        Orquestração e agendamento            │
+│  - Scheduling                                │
 │  - Retries                                   │
-│  - Error handling                             │
+│  - Error handling                            │
 └───────────────────────┬──────────────────────┘
                         │
                         ▼
 ┌──────────────────────────────────────────────┐
 │                 Bronze Layer                 │
-│         Armazenamento Local (Docker)          │
+│         Armazenamento Local (Docker)         │
 │  - Python                                    │
 │  - Requests                                  │
 │  - Dados brutos (raw JSON)                   │
@@ -51,7 +51,7 @@ O diagrama abaixo representa não apenas o fluxo lógico da arquitetura Medallio
                         ▼
 ┌──────────────────────────────────────────────┐
 │                 Silver Layer                 │
-│         Armazenamento Local (Docker)          │
+│         Armazenamento Local (Docker)         │
 │  - Python                                    │
 │  - Pandas                                    │
 │  - Limpeza e padronização                    │
@@ -62,10 +62,10 @@ O diagrama abaixo representa não apenas o fluxo lógico da arquitetura Medallio
                         ▼
 ┌──────────────────────────────────────────────┐
 │                  Gold Layer                  │
-│         Armazenamento Local (Docker)          │
+│         Armazenamento Local (Docker)         │
 │  - Python                                    │
 │  - Agregações analíticas                     │
-│  - Breweries por tipo e localização           │
+│  - Breweries por tipo e localização          │
 └──────────────────────────────────────────────┘
 ```
 
@@ -377,4 +377,5 @@ Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado p
 Este projeto demonstra uma abordagem sólida de Engenharia de Dados, com foco em organização, qualidade, clareza arquitetural e boas práticas de mercado.
 
 ```
+
 
