@@ -297,7 +297,6 @@ Em um ambiente produtivo, o recomendado seria:
 
 ---
 
-```
 
 ---
 
@@ -410,4 +409,5 @@ Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado p
 Este projeto demonstra uma abordagem sólida de Engenharia de Dados, com foco em organização, qualidade, clareza arquitetural e boas práticas de mercado.
 
 ```
+
 
