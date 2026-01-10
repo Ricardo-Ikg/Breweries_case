@@ -266,8 +266,6 @@ docker compose build --no-cache
 # Subir os containers
 docker compose up -d
 ```bash
-# Clonar o repositório
-git clone https://github.com/Ricardo-Ikg/Breweries_case.git
 
 # Entrar no projeto
 cd Breweries_case
@@ -412,3 +410,4 @@ Em um ambiente corporativo de larga escala, Kubernetes poderia ser considerado p
 Este projeto demonstra uma abordagem sólida de Engenharia de Dados, com foco em organização, qualidade, clareza arquitetural e boas práticas de mercado.
 
 ```
+
